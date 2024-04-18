@@ -1,28 +1,12 @@
-// src/index.js
+// tests/index.test.js
 
-const parseQuery = require('./queryParser');
-const readCSV = require('./csvReader');
+const parseQuery = require('../src/queryParser');
 
-async function executeSELECTQuery(query) {
-    const { fields, table, whereClauses } = parseQuery(query);
-    const data = await readCSV(`${table}.csv`);
-
-    // Apply WHERE clause filtering
-    const filteredData = whereClauses.length > 0
-        ? data.filter(row => whereClauses.every(clause => {
-            // You can expand this to handle different operators
-            return row[clause.field] === clause.value;
-        }))
-        : data;
-
-    // Select the specified fields
-    return filteredData.map(row => {
-        const selectedRow = {};
-        fields.forEach(field => {
-            selectedRow[field] = row[field];
-        });
-        return selectedRow;
+test('Parse SQL Query', () => {
+    const query = 'SELECT id, name FROM sample';
+    const parsed = parseQuery(query);
+    expect(parsed).toEqual({
+        fields: ['id', 'name'],
+        table: 'sample'
     });
-}
-
-module.exports = executeSELECTQuery;
+});
